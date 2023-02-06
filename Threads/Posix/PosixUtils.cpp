@@ -20,9 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Posix/PosixUtils.h"
-#include <errno.h>
 #include <pthread.h>
-#include "Threads/skThreadUtils.h"
 
 namespace Rt2::Threads
 {
