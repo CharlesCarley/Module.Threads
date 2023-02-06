@@ -43,6 +43,6 @@ if (TargetFolders)
 endif()
 
 
-if (Template_AUTO_RUN_TEST)
+if (Threads_AUTO_RUN_TEST)
     run_test(${TestTargetName})
 endif()
