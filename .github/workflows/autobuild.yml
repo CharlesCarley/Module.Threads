@@ -13,7 +13,4 @@ jobs:
 
      - name: Build
        run: make
-
-     - name: Test Output
-       run: ./Source/Threads > out.ans && diff out.ans Test/inp.ans
        

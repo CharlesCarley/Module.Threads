@@ -23,7 +23,7 @@
 
 #include "Threads/ThreadUtils.h"
 
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
 #include "Windows/WindowsThread.h"
 #else
 #include "Posix/skPosixThread.h"
@@ -31,7 +31,7 @@
 
 namespace Rt2::Threads
 {
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
     using PlatformThread = WindowsThread;
 #else
     using PlatformThread = PosixThread;
