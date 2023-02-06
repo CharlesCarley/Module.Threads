@@ -30,7 +30,7 @@ namespace Rt2::Threads
     class PosixSemaphore
     {
     private:
-        sem_t _handle;
+        mutable sem_t _handle;
 
         void initialize();
 
