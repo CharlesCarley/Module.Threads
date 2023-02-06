@@ -23,6 +23,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "Threads/Thread.h"
+#include "Utils/Console.h"
 
 namespace Rt2::Threads
 {
@@ -51,7 +52,7 @@ namespace Rt2::Threads
             int status;
             status = pthread_cancel(_thread);
             if (status != 0)
-                tracef("pthread_cancel returned: %i\n", status);
+                Con::writeError("pthread_cancel returned: ", status);
         }
     }
 
@@ -66,7 +67,7 @@ namespace Rt2::Threads
                                      PosixStaticUtils::threadExec,
                                      this)) != 0)
         {
-            tracef("pthread_cancel pthread_create: %i\n", status);
+            Con::writeError("pthread_cancel pthread_create: ", status);
         }
     }
 
