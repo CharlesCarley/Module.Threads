@@ -19,9 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
-#include "Task.h"
+#include "Threads/Task.h"
 #include <cstdint>
-#include "Thread.h"
+#include "Threads/Thread.h"
 
 namespace Rt2::Threads
 {

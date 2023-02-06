@@ -22,7 +22,7 @@
 #pragma once
 
 #include <cstdint>
-#include "CriticalSection.h"
+#include "Threads/CriticalSection.h"
 
 namespace Rt2::Threads
 {

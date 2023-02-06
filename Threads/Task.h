@@ -23,7 +23,7 @@
 
 #include <cstdint>
 #include <functional>
-#include "CriticalSection.h"
+#include "Threads/CriticalSection.h"
 
 namespace Rt2::Threads
 {

@@ -21,9 +21,9 @@
 */
 #include "Threads/ProcessQueue.h"
 #include <thread>
-#include "CriticalSection.h"
-#include "Semaphore.h"
-#include "Thread.h"
+#include "Threads/CriticalSection.h"
+#include "Threads/Semaphore.h"
+#include "Threads/Thread.h"
 #include "Utils/Array.h"
 #include "Utils/Queue.h"
 

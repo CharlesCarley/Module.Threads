@@ -24,9 +24,9 @@
 #include "Threads/ThreadUtils.h"
 
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
-#include "Windows/WindowsCriticalSection.h"
+#include "Threads/Windows/WindowsCriticalSection.h"
 #else
-#include "Posix/PosixCriticalSection.h"
+#include "Threads/Posix/PosixCriticalSection.h"
 #endif
 
 namespace Rt2::Threads

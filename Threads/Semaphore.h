@@ -26,7 +26,7 @@
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
 #include "Threads/Windows/WindowsSemaphore.h"
 #else
-#include "Posix/skPosixSemaphore.h"
+#include "Threads/Posix/PosixSemaphore.h"
 #endif
 
 namespace Rt2::Threads

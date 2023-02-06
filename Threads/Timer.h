@@ -25,16 +25,15 @@
 #include <functional>
 
 
-#include "CriticalSection.h"
-#include "Thread.h"
+#include "Threads/CriticalSection.h"
+#include "Threads/Thread.h"
 
 namespace Rt2::Threads
 {
-    class Timer : public Thread
+    class Timer final : public Thread
     {
     public:
         using Callback = std::function<void()>;
-
         CriticalSection _cs;
 
     private:
@@ -46,10 +45,10 @@ namespace Rt2::Threads
     public:
         explicit Timer(uint32_t milliseconds, Callback callback);
 
-        ~Timer()
+        ~Timer() override
         {
             join();
-        };
+        }
     };
 
 }  // namespace Rt2::Threads
