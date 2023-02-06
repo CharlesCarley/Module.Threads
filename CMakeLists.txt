@@ -32,16 +32,17 @@ if (Threads_ExternalTarget)
     set(TargetGroup   ${Threads_TargetGroup})
 else()
     add_subdirectory(CMake)
+    add_subdirectory(Internal/Utils)
 
     set(TargetFolders TRUE)
     set(TargetName Threads)
     set(TargetGroup )
 
-    set(Threads_INCLUDE  ${Threads_SOURCE_DIR}/Source)
+    set(Threads_INCLUDE  ${Threads_SOURCE_DIR})
     set(Threads_LIBRARY  ${TargetName})
 endif()
 
-add_subdirectory(Source)
+add_subdirectory(Threads)
 
 if (Threads_BUILD_TEST)
     if (NOT Threads_ExternalTarget)
