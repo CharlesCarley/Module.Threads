@@ -25,23 +25,23 @@
 namespace Rt2::Threads
 {
     WindowsCriticalSection::WindowsCriticalSection() :
-        m_criticalSection({})
+        _criticalSection({})
     {
-        InitializeCriticalSection(&m_criticalSection);
+        InitializeCriticalSection(&_criticalSection);
     }
 
     WindowsCriticalSection::~WindowsCriticalSection()
     {
-        DeleteCriticalSection(&m_criticalSection);
+        DeleteCriticalSection(&_criticalSection);
     }
 
     void WindowsCriticalSection::lockImpl()
     {
-        EnterCriticalSection(&m_criticalSection);
+        EnterCriticalSection(&_criticalSection);
     }
 
     void WindowsCriticalSection::unlockImpl()
     {
-        LeaveCriticalSection(&m_criticalSection);
+        LeaveCriticalSection(&_criticalSection);
     }
 }  // namespace Rt2::Threads

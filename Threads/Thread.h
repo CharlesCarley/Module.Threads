@@ -26,7 +26,7 @@
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
 #include "Threads/Windows/WindowsThread.h"
 #else
-#include "Threads/Posix/skPosixThread.h"
+#include "Threads/Posix/PosixThread.h"
 #endif
 
 namespace Rt2::Threads

@@ -88,12 +88,12 @@ namespace Rt2::Threads
         finalize();
     }
 
-    void PosixSemaphore::waitImpl()
+    void PosixSemaphore::waitImpl() const
     {
         sem_wait(&_handle);
     }
 
-    void PosixSemaphore::signalImpl()
+    void PosixSemaphore::signalImpl() const
     {
         sem_post(&_handle);
     }

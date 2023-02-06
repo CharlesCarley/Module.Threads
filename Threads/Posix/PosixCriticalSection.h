@@ -29,14 +29,14 @@ namespace Rt2::Threads
     {
     private:
         pthread_mutex_t _mutex;
-        bool            _isInit;
+        mutable bool    _isInit;
 
     protected:
         PosixCriticalSection();
         virtual ~PosixCriticalSection();
 
-        void lockImpl();
+        void lockImpl() const;
 
-        void unlockImpl();
+        void unlockImpl() const;
     };
 }  // namespace Rt2::Threads

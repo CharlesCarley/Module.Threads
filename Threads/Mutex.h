@@ -26,7 +26,7 @@
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
 #include "Threads/Windows/WindowsMutex.h"
 #else
-#include "Threads/Posix/skPosixMutex.h"
+#include "Threads/Posix/PosixMutex.h"
 #endif
 
 namespace Rt2::Threads

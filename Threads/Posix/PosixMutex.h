@@ -29,7 +29,7 @@ namespace Rt2::Threads
     {
     protected:
         pthread_mutex_t _mutex;
-        bool            _isInit;
+        mutable bool    _isInit;
 
     protected:
         PosixMutex();
@@ -39,10 +39,10 @@ namespace Rt2::Threads
 
         void unlockImpl();
 
-        void waitImpl();
+        void waitImpl() const;
 
-        void waitImpl(size_t milliseconds);
+        void waitImpl(size_t milliseconds) const;
 
-        void notifyImpl();
+        void notifyImpl() const;
     };
 }  // namespace Rt2::Threads

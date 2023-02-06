@@ -40,8 +40,8 @@ namespace Rt2::Threads
         PosixSemaphore();
         virtual ~PosixSemaphore();
 
-        void waitImpl();
+        void waitImpl() const;
 
-        void signalImpl();
+        void signalImpl() const;
     };
 }  // namespace Rt2::Threads

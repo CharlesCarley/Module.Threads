@@ -21,7 +21,7 @@
 */
 #include "Threads/Posix/PosixCriticalSection.h"
 #include "Threads/Posix/PosixUtils.h"
-#include "Threads/skThreadUtils.h"
+#include "Threads/ThreadUtils.h"
 #include "Utils/Console.h"
 
 namespace Rt2::Threads
@@ -42,7 +42,7 @@ namespace Rt2::Threads
         }
     }
 
-    void PosixCriticalSection::lockImpl()
+    void PosixCriticalSection::lockImpl() const
     {
         int status;
         if (!_isInit)
@@ -60,7 +60,7 @@ namespace Rt2::Threads
             Console::writeLine("pthread_mutex_lock returned ", status);
     }
 
-    void PosixCriticalSection::unlockImpl()
+    void PosixCriticalSection::unlockImpl() const
     {
         int status = pthread_mutex_unlock((pthread_mutex_t*)&_mutex);
         if (status != NoError)

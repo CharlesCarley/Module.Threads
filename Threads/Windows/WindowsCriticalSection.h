@@ -29,7 +29,7 @@ namespace Rt2::Threads
     class WindowsCriticalSection
     {
     private:
-        CRITICAL_SECTION m_criticalSection;
+        CRITICAL_SECTION _criticalSection;
 
     protected:
         WindowsCriticalSection();

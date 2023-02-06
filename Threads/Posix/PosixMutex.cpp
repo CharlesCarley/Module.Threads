@@ -21,7 +21,7 @@
 */
 #include "Threads/Posix/PosixMutex.h"
 #include "Threads/Posix/PosixUtils.h"
-#include "Threads/skThreadUtils.h"
+#include "Threads/ThreadUtils.h"
 #include "Threads/Windows/stubs/pthread.h"
 #include "Utils/Console.h"
 
@@ -73,7 +73,7 @@ namespace Rt2::Threads
             Console::writeLine("pthread_mutex_unlock returned ", status);
     }
 
-    void PosixMutex::waitImpl()
+    void PosixMutex::waitImpl() const
     {
         int status;
         if (_isInit)
@@ -84,7 +84,7 @@ namespace Rt2::Threads
         }
     }
 
-    void PosixMutex::waitImpl(size_t milliseconds)
+    void PosixMutex::waitImpl(size_t milliseconds) const
     {
         if (_isInit)
         {
@@ -96,7 +96,7 @@ namespace Rt2::Threads
         }
     }
 
-    void PosixMutex::notifyImpl()
+    void PosixMutex::notifyImpl() const
     {
         int status;
         if (_isInit)
