@@ -22,7 +22,6 @@
 #include "Threads/Posix/PosixMutex.h"
 #include "Threads/Posix/PosixUtils.h"
 #include "Threads/ThreadUtils.h"
-#include "Threads/Windows/stubs/pthread.h"
 #include "Utils/Console.h"
 
 namespace Rt2::Threads
