@@ -34,7 +34,6 @@ namespace Rt2::Threads
     {
     private:
         friend TaskPrivate;
-
         TaskPrivate* _private;
         TaskCall     _done;
 
@@ -45,6 +44,7 @@ namespace Rt2::Threads
         ~Task();
 
         const Task& invoke() const;
+
         const Task& wait(uint32_t ms = 0) const;
 
         const Task& whenDone(const TaskCall& call);

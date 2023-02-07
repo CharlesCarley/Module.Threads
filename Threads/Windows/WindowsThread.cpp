@@ -27,26 +27,19 @@
 
 namespace Rt2::Threads
 {
-    WindowsThread::WindowsThread() :
-        _thread(NullThread),
-        _id(Npos)
-    {
-    }
-
     WindowsThread::~WindowsThread()
     {
         joinImpl();
     }
 
-    static DWORD WINAPI ThreadCallback(LPVOID user)
+    static DWORD WINAPI ThreadCallback(const LPVOID user)
     {
         try
         {
-            WindowsThread* thread = static_cast<WindowsThread*>(user);
-            if (thread)
+            if (WindowsThread* thread = static_cast<WindowsThread*>(user))
                 return thread->update();
         }
-        catch (Exception & e)
+        catch (Exception& e)
         {
             Console::writeLine(e.what());
         }
@@ -77,10 +70,13 @@ namespace Rt2::Threads
             ::WaitForSingleObject((HANDLE)_thread, INFINITE);
     }
 
-    void WindowsThread::waitImpl(size_t milliseconds) const
+    void WindowsThread::waitImpl(const size_t milliseconds) const
     {
         if (_thread != NullThread)
-            ::WaitForSingleObject((HANDLE)_thread, (DWORD)milliseconds);
+            ::WaitForSingleObjectEx(
+                (HANDLE)_thread,
+                (DWORD)milliseconds,
+                TRUE);
     }
 
     void WindowsThread::joinImpl()
@@ -90,22 +86,19 @@ namespace Rt2::Threads
             if (_thread != NullThread)
             {
                 waitImpl(INFINITE);
-
                 if (CloseHandle((HANDLE)_thread) == FALSE)
                     Console::writeLine("Failed to close thread handle : ", GetLastError());
-
                 _thread = NullThread;
                 _id     = Npos;
             }
         }
-        catch (Exception &ex)
+        catch (Exception& ex)
         {
             Console::writeLine(ex.what());
-
             _thread = NullThread;
             _id     = Npos;
         }
-        catch(...)
+        catch (...)
         {
             _thread = NullThread;
             _id     = Npos;

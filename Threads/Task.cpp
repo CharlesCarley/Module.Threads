@@ -67,7 +67,7 @@ namespace Rt2::Threads
         return *this;
     }
 
-    const Task& Task::wait(uint32_t ms) const
+    const Task& Task::wait(const uint32_t ms) const
     {
         if (_private)
             _private->wait(ms);

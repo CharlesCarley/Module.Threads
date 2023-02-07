@@ -41,6 +41,7 @@ namespace Rt2::Threads
     {
     public:
         Thread();
+
         ~Thread() override;
 
         void wait() const
@@ -48,7 +49,7 @@ namespace Rt2::Threads
             waitImpl(0);
         }
 
-        void wait(size_t milliseconds) const
+        void wait(const size_t milliseconds) const
         {
             waitImpl(milliseconds);
         }

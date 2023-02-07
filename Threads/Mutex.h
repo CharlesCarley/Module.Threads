@@ -42,8 +42,6 @@ namespace Rt2::Threads
     public:
         Mutex() = default;
 
-        ~Mutex() override = default;
-
         void lock()
         {
             lockImpl();

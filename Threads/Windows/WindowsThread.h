@@ -28,12 +28,11 @@ namespace Rt2::Threads
     class WindowsThread
     {
     private:
-        ThreadHandle _thread;
-        size_t         _id;  // unused at the moment
+        ThreadHandle _thread{NullThread};
+        size_t       _id{Npos};  // unused at the moment
 
     protected:
-
-        WindowsThread();
+        WindowsThread() = default;
 
         virtual ~WindowsThread();
 
@@ -46,8 +45,6 @@ namespace Rt2::Threads
         void joinImpl();
 
     public:
-
-
         virtual int update()
         {
             joinImpl();

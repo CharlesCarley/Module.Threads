@@ -28,7 +28,7 @@ namespace Rt2::Threads
     class WindowsMutex
     {
     protected:
-        MutexHandle _mutex;
+        MutexHandle _mutex{};
         bool        _isLocked;
 
         void lockImpl();
