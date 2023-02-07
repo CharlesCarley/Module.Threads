@@ -154,7 +154,7 @@ namespace Rt2::Threads
     void ProcessQueue::flush()
     {
         RT_ASSERT(_private)
-        CriticalSectionLock lock(&_criticalSection);
+        //CriticalSectionLock lock(&_criticalSection);
         if (_private)
             _private->flush();
     }
