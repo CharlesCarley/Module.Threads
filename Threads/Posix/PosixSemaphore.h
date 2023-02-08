@@ -21,23 +21,19 @@
 */
 #pragma once
 
-#include <semaphore.h>
-#include "Threads/Thread.h"
-#include "Threads/ThreadUtils.h"
+#include "Threads/Posix/PosixUtils.h"
 
 namespace Rt2::Threads
 {
     class PosixSemaphore
     {
     private:
-        mutable sem_t _handle;
-
-        void initialize();
-
-        void finalize();
+        sem_t _handle{NullSemaphore};
+        bool  _init{true};
 
     protected:
         PosixSemaphore();
+
         virtual ~PosixSemaphore();
 
         void waitImpl() const;

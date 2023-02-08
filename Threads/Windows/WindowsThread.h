@@ -21,6 +21,7 @@
 */
 #pragma once
 
+#include "Threads/CriticalSection.h"
 #include "Threads/ThreadUtils.h"
 
 namespace Rt2::Threads
@@ -51,4 +52,11 @@ namespace Rt2::Threads
             return 0;
         }
     };
+
+
+    inline HANDLE toHandle(const ThreadHandle hand)
+    {
+        return reinterpret_cast<HANDLE>(hand);
+    }
+
 }  // namespace Rt2::Threads

@@ -20,19 +20,19 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-
-#include <pthread.h>
+#include "Threads/Windows/stubs/pthread.h"
 
 namespace Rt2::Threads
 {
     class PosixMutex
     {
     protected:
-        pthread_mutex_t _mutex;
-        mutable bool    _isInit;
+        pthread_mutex_t _mutex{};
+        bool            _isInit{true};
 
     protected:
         PosixMutex();
+
         virtual ~PosixMutex();
 
         void lockImpl();

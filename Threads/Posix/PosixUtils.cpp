@@ -20,10 +20,8 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Posix/PosixUtils.h"
-#include <pthread.h>
+#include "Threads/Windows/stubs/pthread.h"
 
 namespace Rt2::Threads
 {
-    const sem_t           PosixUtils::NullSemaphore = {};
-    const pthread_mutex_t PosixUtils::NullMutex     = {};
 }  // namespace Rt2::Threads

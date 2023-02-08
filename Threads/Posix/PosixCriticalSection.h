@@ -21,22 +21,25 @@
 */
 #pragma once
 
-#include <pthread.h>
+#include "Threads/ThreadUtils.h"
+#include "Threads/Windows/stubs/pthread.h"
 
 namespace Rt2::Threads
 {
     class PosixCriticalSection
     {
     private:
-        pthread_mutex_t _mutex;
-        mutable bool    _isInit;
+        pthread_mutex_t _mutex{};
+        int             _status{NoError};
 
     protected:
         PosixCriticalSection();
+
         virtual ~PosixCriticalSection();
 
         void lockImpl() const;
 
         void unlockImpl() const;
     };
+
 }  // namespace Rt2::Threads

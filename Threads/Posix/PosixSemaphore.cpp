@@ -25,37 +25,39 @@
 
 namespace Rt2::Threads
 {
-    void PosixSemaphore::initialize()
+
+
+    PosixSemaphore::PosixSemaphore()
     {
-        int st = sem_init(&_handle, 0, 1);
-        if (st == -1)
+        if (const int st = sem_init(&_handle, 0, 1);
+            st == -1)
         {
             switch (errno)
             {
             case EINVAL:  // hard coded
                 break;
             case ENOSPC:
-                Console::writeLine("The maximum number of semaphores has been reached");
+                Console::writeLine("maximum number of semaphores has been reached");
                 break;
             case ENOSYS:
                 Console::writeLine("sem_init is not supported");
                 break;
             case EPERM:
-                Console::writeLine("The process lacks the privileges to use sem_init");
+                Console::writeLine("the process lacks the privileges to use sem_init");
                 break;
             default:
                 Console::writeLine("sem_init - unknown error");
                 break;
             }
-
-            _handle = PosixUtils::NullSemaphore;
+            _handle = NullSemaphore;
+            _init   = false;
         }
     }
 
-    void PosixSemaphore::finalize()
+    PosixSemaphore::~PosixSemaphore()
     {
-        int st = sem_destroy(&_handle);
-        if (st == -1)
+        if (const int st = sem_destroy(&_handle);
+            st == -1)
         {
             switch (errno)
             {
@@ -73,28 +75,19 @@ namespace Rt2::Threads
                 break;
             }
 
-            _handle = PosixUtils::NullSemaphore;
+            _handle = NullSemaphore;
         }
-    }
-
-    PosixSemaphore::PosixSemaphore() :
-        _handle(PosixUtils::NullSemaphore)
-    {
-        initialize();
-    }
-
-    PosixSemaphore::~PosixSemaphore()
-    {
-        finalize();
     }
 
     void PosixSemaphore::waitImpl() const
     {
-        sem_wait(&_handle);
+        if (_init)
+            sem_wait(const_cast<sem_t*>(&_handle));
     }
 
     void PosixSemaphore::signalImpl() const
     {
-        sem_post(&_handle);
+        if (_init)
+            sem_post(const_cast<sem_t*>(&_handle));
     }
 }  // namespace Rt2::Threads

@@ -1,6 +1,7 @@
 #pragma once
-#include <errno.h>
+#ifdef WIN32
 
+#include "errno.h"
 struct pthread_mutex_t
 {
     int __size;
@@ -26,3 +27,8 @@ extern int pthread_join(pthread_t thread, void** retval);
 
 /// https://man7.org/linux/man-pages/man3/pthread_create.3.html
 extern int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg);
+
+#else
+#include <errno.h>
+#include <pthread.h>
+#endif

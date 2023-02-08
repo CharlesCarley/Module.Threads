@@ -20,54 +20,53 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Posix/PosixThread.h"
-#include <pthread.h>
-#include <unistd.h>
+#include "PosixUtils.h"
 #include "Threads/Thread.h"
+#include "Threads/Windows/stubs/unistd.h"
 #include "Utils/Console.h"
 
 namespace Rt2::Threads
 {
-    class PosixStaticUtils
-    {
-    public:
-        static void* threadExec(void* arg0)
-        {
-            Thread* thread = (Thread*)arg0;
-            if (thread)
-                thread->update();
-            return nullptr;
-        }
-    };
 
-    PosixThread::PosixThread() :
-        _id(Npos),
-        _thread(NullThread)
-    {
-    }
+    PosixThread::PosixThread() = default;
 
     PosixThread::~PosixThread()
     {
-        if (_thread != NullThread)
+        if (_thread != NullPThread)
         {
-            int status;
-            status = pthread_cancel(_thread);
-            if (status != 0)
-                Con::writeError("pthread_cancel returned: ", status);
+            if (int status = pthread_cancel(_thread);
+                status != 0)
+                Con::writeError("failed to destroy thread: ", status);
         }
+    }
+
+    void PosixThread::waitImpl() const
+    {
     }
 
     void PosixThread::startImpl()
     {
-        if (_thread != NullThread)
+        if (_thread != NullPThread)
             joinImpl();
-        int status;
 
-        if ((status = pthread_create((pthread_t*)&_thread,
-                                     nullptr,
-                                     PosixStaticUtils::threadExec,
-                                     this)) != 0)
+        struct Runner
         {
-            Con::writeError("pthread_cancel pthread_create: ", status);
+            static void* hook(void* arg0)
+            {
+                if (Thread* thread = (Thread*)arg0)
+                    thread->update();
+                return nullptr;
+            }
+        };
+
+        if (int status = pthread_create(
+                &_thread,
+                nullptr,
+                Runner::hook,
+                this);
+            status != 0)
+        {
+            Con::writeError("failed to create thread: ", status);
         }
     }
 
@@ -78,8 +77,15 @@ namespace Rt2::Threads
 
     void PosixThread::joinImpl()
     {
-        if (_thread != NullThread)
+        if (_thread != NullPThread)
             pthread_join(_thread, nullptr);
-        _thread = NullThread;
+        _thread = NullPThread;
+    }
+
+
+    int PosixThread::update()
+    {
+        joinImpl();
+        return 0;
     }
 }  // namespace Rt2::Threads

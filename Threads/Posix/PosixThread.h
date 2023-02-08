@@ -21,16 +21,17 @@
 */
 #pragma once
 
-#include <pthread.h>
-#include "Threads/Mutex.h"
+#include "Threads/Posix/PosixUtils.h"
+#include "Threads/Windows/stubs/pthread.h"
+#include "Utils/Definitions.h"
 
 namespace Rt2::Threads
 {
     class PosixThread
     {
     private:
-        size_t    _id;
-        pthread_t _thread;
+        size_t    _id{Npos};
+        pthread_t _thread{NullPThread};
 
     protected:
         PosixThread();
@@ -46,10 +47,8 @@ namespace Rt2::Threads
         void joinImpl();
 
     public:
-        virtual int update()
-        {
-            joinImpl();
-            return 0;
-        }
+
+
+        virtual int update();
     };
 }  // namespace Rt2::Threads

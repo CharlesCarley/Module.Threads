@@ -25,10 +25,10 @@
 
 namespace Rt2::Threads
 {
-    typedef size_t ThreadHandle;
-    typedef size_t MutexHandle;
+    typedef uintptr_t ThreadHandle;
+    typedef uintptr_t MutexHandle;
 
-    constexpr ThreadHandle NullThread = Npos;
+    constexpr ThreadHandle NullThread = MakeLimit<ThreadHandle>();
     constexpr ThreadHandle NoError    = 0;
 
 }  // namespace Rt2::Threads

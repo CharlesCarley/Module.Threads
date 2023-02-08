@@ -21,16 +21,13 @@
 */
 #pragma once
 
-#include <errno.h>
-#include <pthread.h>
-#include <semaphore.h>
+#include "Threads/Windows/stubs/pthread.h"
+#include "Threads/Windows/stubs/semaphore.h"
 
 namespace Rt2::Threads
 {
-    class PosixUtils
-    {
-    public:
-        static const sem_t           NullSemaphore;
-        static const pthread_mutex_t NullMutex;
-    };
+    constexpr sem_t           NullSemaphore = {};
+    constexpr pthread_mutex_t NullMutex     = {};
+    constexpr pthread_t       NullPThread   = {};
+
 }  // namespace Rt2::Threads

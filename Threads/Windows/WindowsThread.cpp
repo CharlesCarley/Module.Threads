@@ -32,49 +32,52 @@ namespace Rt2::Threads
         joinImpl();
     }
 
-    static DWORD WINAPI ThreadCallback(const LPVOID user)
-    {
-        try
-        {
-            if (WindowsThread* thread = static_cast<WindowsThread*>(user))
-                return thread->update();
-        }
-        catch (Exception& e)
-        {
-            Console::writeLine(e.what());
-        }
-        catch (...)
-        {
-        }
-        return 0;
-    }
-
     void WindowsThread::startImpl()
     {
+        struct Runner
+        {
+            static DWORD WINAPI hook(const LPVOID user)
+            {
+                try
+                {
+                    if (WindowsThread* thread = static_cast<WindowsThread*>(user))
+                        return thread->update();
+                }
+                catch (Exception& e)
+                {
+                    Console::writeLine(e.what());
+                }
+                catch (...)
+                {
+                }
+                return 0;
+            }
+        };
+
         if (_thread != NullThread)
             joinImpl();
 
         _thread = (ThreadHandle)CreateThread(
-            nullptr,         // No inheritance
-            0,               // Use the default stack size
-            ThreadCallback,  // main routine
-            this,            // parameter
-            0,               // dwCreationFlags
-            (LPDWORD)&_id    // lpThreadId
+            nullptr,       // No inheritance
+            0,             // Use the default stack size
+            Runner::hook,  // main routine
+            this,          // parameter
+            0,             // dwCreationFlags
+            (LPDWORD)&_id  // lpThreadId
         );
     }
 
     void WindowsThread::waitImpl() const
     {
         if (_thread != NullThread)
-            ::WaitForSingleObject((HANDLE)_thread, INFINITE);
+            ::WaitForSingleObject(toHandle(_thread), INFINITE);
     }
 
     void WindowsThread::waitImpl(const size_t milliseconds) const
     {
         if (_thread != NullThread)
             ::WaitForSingleObjectEx(
-                (HANDLE)_thread,
+                toHandle(_thread),
                 (DWORD)milliseconds,
                 TRUE);
     }
@@ -86,7 +89,7 @@ namespace Rt2::Threads
             if (_thread != NullThread)
             {
                 waitImpl(INFINITE);
-                if (CloseHandle((HANDLE)_thread) == FALSE)
+                if (CloseHandle(toHandle(_thread)) == FALSE)
                     Console::writeLine("Failed to close thread handle : ", GetLastError());
                 _thread = NullThread;
                 _id     = Npos;

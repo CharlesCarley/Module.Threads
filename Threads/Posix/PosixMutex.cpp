@@ -26,83 +26,72 @@
 
 namespace Rt2::Threads
 {
-    PosixMutex::PosixMutex() :
-        _mutex(PosixUtils::NullMutex),
-        _isInit(false)
+    PosixMutex::PosixMutex()
     {
+        if (int status = pthread_mutex_init(&_mutex, nullptr);
+            status != NoError)
+        {
+            Console::writeLine("failed to initialize mutex ", status);
+            _isInit = false;
+        }
     }
 
     PosixMutex::~PosixMutex()
     {
         if (_isInit)
         {
-            int status = pthread_mutex_destroy((pthread_mutex_t*)&_mutex);
-            if (status != NoError)
-                Console::writeLine("pthread_mutex_destroy returned ", status);
+            if (int status = pthread_mutex_destroy(&_mutex);
+                status != NoError)
+                Console::writeLine("failed to finalize mutex: ", status);
             _isInit = false;
         }
     }
 
     void PosixMutex::lockImpl()
     {
-        int status;
-        if (!_isInit)
-        {
-            status = pthread_mutex_init((pthread_mutex_t*)&_mutex, nullptr);
-            if (status != NoError)
-            {
-                Console::writeLine("pthread_mutex_init returned ", status);
-                return;
-            }
-            _isInit = true;
-        }
-
-        status = pthread_mutex_lock((pthread_mutex_t*)&_mutex);
-        if (status != NoError)
-            Console::writeLine("pthread_mutex_lock returned ", status);
+        notifyImpl();
     }
 
     void PosixMutex::unlockImpl()
     {
-        if (!_isInit)
-            return;
-
-        int status = pthread_mutex_unlock((pthread_mutex_t*)&_mutex);
-        if (status != NoError)
-            Console::writeLine("pthread_mutex_unlock returned ", status);
+        if (_isInit)
+        {
+            if (int status = pthread_mutex_unlock(&_mutex);
+                status != NoError)
+                Console::writeLine("failed to unlock mutex: ", status);
+        }
     }
 
     void PosixMutex::waitImpl() const
     {
-        int status;
         if (_isInit)
         {
-            status = pthread_mutex_lock((pthread_mutex_t*)&_mutex);
-            if (status != NoError)
-                Console::writeLine("pthread_mutex_lock returned ", status);
+            if (int status = pthread_mutex_lock(
+                    const_cast<pthread_mutex_t*>(&_mutex));
+                status != NoError)
+                Console::writeLine("failed to lock mutex: ", status);
         }
     }
 
-    void PosixMutex::waitImpl(size_t milliseconds) const
+    void PosixMutex::waitImpl(const size_t milliseconds) const
     {
         if (_isInit)
         {
             struct timespec timed = {0, (long)(milliseconds * 1000)};
-
-            int status = pthread_mutex_timedlock((pthread_mutex_t*)&_mutex, &timed);
-            if (status != NoError)
-                Console::writeLine("pthread_mutex_timedlock returned ", status);
+            if (int status = pthread_mutex_timedlock(
+                    const_cast<pthread_mutex_t*>(&_mutex), &timed);
+                status != NoError)
+                Console::writeLine("failed to lock mutex: ", status);
         }
     }
 
     void PosixMutex::notifyImpl() const
     {
-        int status;
         if (_isInit)
         {
-            status = pthread_mutex_lock((pthread_mutex_t*)&_mutex);
-            if (status != NoError)
-                Console::writeLine("pthread_mutex_lock returned ", status);
+            if (int status = pthread_mutex_lock(const_cast<pthread_mutex_t*>(&_mutex));
+                status != NoError)
+                Console::writeLine("failed to lock mutex: ", status);
         }
     }
 }  // namespace Rt2::Threads
