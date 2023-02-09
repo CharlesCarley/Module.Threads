@@ -22,7 +22,6 @@
 #include "Threads/Posix/PosixThread.h"
 #include "PosixUtils.h"
 #include "Threads/Thread.h"
-#include "Threads/Windows/stubs/unistd.h"
 #include "Utils/Console.h"
 
 namespace Rt2::Threads
@@ -32,16 +31,7 @@ namespace Rt2::Threads
 
     PosixThread::~PosixThread()
     {
-        if (_thread != NullPThread)
-        {
-            if (int status = pthread_cancel(_thread);
-                status != 0)
-                Con::writeError("failed to destroy thread: ", status);
-        }
-    }
-
-    void PosixThread::waitImpl() const
-    {
+        joinImpl();
     }
 
     void PosixThread::startImpl()
@@ -49,8 +39,7 @@ namespace Rt2::Threads
         if (_thread != NullPThread)
             joinImpl();
 
-        struct Runner
-        {
+        struct Runner {
             static void* hook(void* arg0)
             {
                 if (Thread* thread = (Thread*)arg0)
@@ -59,27 +48,28 @@ namespace Rt2::Threads
             }
         };
 
-        if (int status = pthread_create(
-                &_thread,
-                nullptr,
-                Runner::hook,
-                this);
-            status != 0)
-        {
-            Con::writeError("failed to create thread: ", status);
-        }
-    }
+        pthread_attr_init(&_attr);
+        pthread_attr_setdetachstate(&_attr, PTHREAD_CREATE_JOINABLE);
 
-    void PosixThread::waitImpl(size_t milliseconds) const
-    {
-        usleep(milliseconds * 1000);
+        if (int st = pthread_create(&_thread, &_attr, Runner::hook, this);
+            st != 0)
+        {
+            Con::writeError("failed to create thread: ", st);
+        }
     }
 
     void PosixThread::joinImpl()
     {
         if (_thread != NullPThread)
-            pthread_join(_thread, nullptr);
-        _thread = NullPThread;
+        {
+            if (int st = pthread_join(_thread, nullptr); st != 0)
+                Con::writeError("failed to destroy thread: ", st);
+            if (int st = pthread_attr_destroy(&_attr); st != 0)
+                Con::writeError("failed to destroy thread: ", st);
+
+            _attr   = {};
+            _thread = NullPThread;
+        }
     }
 
 

@@ -26,5 +26,20 @@ namespace Rt2::Threads
     Thread::Thread() = default;
     Thread::~Thread() = default;
 
+    void Thread::start()
+    {
+        startImpl();
+    }
 
+    void Thread::join()
+    {
+        joinImpl();
+    }
+
+    int Thread::update()
+    {
+        // rejoin the thread if not overridden
+        joinImpl();
+        return 0;
+    }
 }  // namespace Rt2::Threads

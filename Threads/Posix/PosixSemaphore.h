@@ -28,16 +28,17 @@ namespace Rt2::Threads
     class PosixSemaphore
     {
     private:
-        sem_t _handle{NullSemaphore};
+        sem_t _sem = NullSemaphore;
         bool  _init{true};
+        bool  _locked{false};
 
     protected:
         PosixSemaphore();
 
         virtual ~PosixSemaphore();
 
-        void waitImpl() const;
+        void waitImpl();
 
-        void signalImpl() const;
+        void signalImpl();
     };
 }  // namespace Rt2::Threads

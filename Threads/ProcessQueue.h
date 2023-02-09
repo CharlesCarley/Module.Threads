@@ -68,6 +68,7 @@ namespace Rt2::Threads
         ~ProcessQueue();
 
         void enqueue(Packet* packet);
+
         void flush();
 
         bool isEmpty();

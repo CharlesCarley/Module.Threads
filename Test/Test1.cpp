@@ -20,9 +20,9 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/CriticalSection.h"
+#include "Threads/MemoryDataStore.h"
 #include "Threads/ProcessQueue.h"
 #include "Threads/Task.h"
-#include "Threads/MemoryDataStore.h"
 #include "Utils/Console.h"
 #include "Utils/FixedArray.h"
 #include "Utils/String.h"
@@ -35,20 +35,21 @@ using OutputDatabase = MemoryDataStore<String, 32>;
 GTEST_TEST(Threads, Thread_001)
 {
     int x = 0;
-    Task task(
+    Task::start(
         [&x]
         {
-            while (x < 10000)
-                x += 1;
+            EXPECT_EQ(x, 0);
+            while (++x < 10000)
+            {
+            }
+            EXPECT_EQ(x, 10000);
+        },
+        [&x]
+        {
+            EXPECT_EQ(x, 10000);
+            x+=1;
         });
-    (void)task.whenDone(
-                  [&x]
-                  {
-                      Console::writeLine("The Value of x = ", x);
-                      EXPECT_EQ(x, 10000);
-                  })
-        .invoke()
-        .wait();
+   EXPECT_EQ(x, 10001);
 }
 
 GTEST_TEST(Threads, Thread_002)
@@ -58,19 +59,19 @@ GTEST_TEST(Threads, Thread_002)
 
     for (int i = 0; i < 16; ++i)
     {
-        Task([]
-             { OutputDatabase::insert("Hello"); })
-            .invoke();
-        Task([]
-             { OutputDatabase::insert("World"); })
-            .invoke();
+        Task::start([]
+                    { OutputDatabase::insert("Hello"); });
+        Task::start([]
+                    { OutputDatabase::insert("World"); });
     }
 
     const OutputDatabase::Database& db = OutputDatabase::get();
 
+    int i = 0;
+    EXPECT_EQ(db.size(), 32);
     for (const String& str : db)
     {
-        Console::writeLine(str);
+        EXPECT_TRUE(str == "Hello" || str == "World");
     }
 }
 

@@ -19,34 +19,32 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
-#pragma once
-
-#include <functional>
+#include "Threads/Windows/WindowsUtils.h"
+#include "Utils/Console.h"
+#include "Utils/StreamMethods.h"
 
 namespace Rt2::Threads
 {
-    class TaskPrivate;
-    using TaskCall = std::function<void()>;
-
-    class Task
+    void LogError(const char* message, DWORD res)
     {
-    private:
-        friend TaskPrivate;
-        TaskPrivate* _private{nullptr};
-        TaskCall     _done{nullptr};
+        const DWORD err = GetLastError();
+        LPSTR       buf = nullptr;
+        FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+            nullptr,
+            err,
+            0,
+            (LPSTR)&buf,
+            0,
+            nullptr);
 
-        void notifyDone() const;
+        if (buf)
+        {
+            Console::writeError("code: ", Hex(err), ", ", buf, " ", message);
+            LocalFree(buf);
+        }
+        else
+            Console::writeError(message, ": (", res, ") ", err);
+    }
 
-        void invoke() const;
-
-        Task& whenDone(const TaskCall& call);
-
-    public:
-        explicit Task(const TaskCall& call);
-        ~Task();
-
-        static void start(const TaskCall& main, const TaskCall& onDone);
-
-        static void start(const TaskCall& main);
-    };
 }  // namespace Rt2::Threads

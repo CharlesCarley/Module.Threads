@@ -28,18 +28,16 @@ namespace Rt2::Threads
     class WindowsMutex
     {
     protected:
-        MutexHandle _mutex{};
-        bool        _isLocked;
+        MutexHandle _mutex{NullHandle};
+        bool        _isLocked{false};
 
         void lockImpl();
 
         void unlockImpl();
 
-        void waitImpl() const;
+        void waitImpl();
 
-        void waitImpl(size_t milliseconds) const;
-
-        void notifyImpl() const;
+        void waitImpl(size_t ms);
 
     protected:
         WindowsMutex();

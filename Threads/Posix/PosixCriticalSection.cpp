@@ -22,40 +22,41 @@
 #include "Threads/Posix/PosixCriticalSection.h"
 #include "Threads/Posix/PosixUtils.h"
 #include "Threads/ThreadUtils.h"
-#include "Utils/Console.h"
 
 namespace Rt2::Threads
 {
 
     PosixCriticalSection::PosixCriticalSection()
     {
-        if (_status = pthread_mutex_init(&_mutex, nullptr);
-            _status != NoError)
-            Console::writeLine("failed to initialize mutex: ", _status);
+        if (_status = pthread_mutex_init(&_mutex, nullptr); _status != NoError)
+            LogError("failed to initialize mutex", _status);
     }
 
     PosixCriticalSection::~PosixCriticalSection()
     {
-        if (_status != NoError)
+        if (_status == NoError)
         {
-            if (int status = pthread_mutex_destroy(&_mutex);
-                status != NoError)
-                Console::writeLine("pthread_mutex_destroy returned ", status);
+            if (const int stat = pthread_mutex_destroy(&_mutex); stat != NoError)
+                LogError("failed to destroy mutex", stat);
         }
     }
 
     void PosixCriticalSection::lockImpl() const
     {
-        if (int status = pthread_mutex_lock(const_cast<pthread_mutex_t*>(&_mutex));
-            status != NoError)
-            Console::writeLine("failed to lock mutex", status);
+        if (_status == NoError)
+        {
+            if (const int stat = pthread_mutex_lock(const_cast<pthread_mutex_t*>(&_mutex)); stat != NoError)
+                LogError("failed to lock mutex", stat);
+        }
     }
 
     void PosixCriticalSection::unlockImpl() const
     {
-        if (int status = pthread_mutex_unlock(const_cast<pthread_mutex_t*>(&_mutex));
-            status != NoError)
-            Console::writeLine("failed to unlock mutex", status);
+        if (_status == NoError)
+        {
+            if (const int stat = pthread_mutex_unlock(const_cast<pthread_mutex_t*>(&_mutex)); stat != NoError)
+                LogError("failed to unlock mutex", stat);
+        }
     }
 
 }  // namespace Rt2::Threads

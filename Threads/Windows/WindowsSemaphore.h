@@ -20,26 +20,23 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
+#include "Threads/ThreadUtils.h"
 
 namespace Rt2::Threads
 {
     class WindowsSemaphore
     {
     private:
-        size_t _handle;
-
-        void initialize();
-
-        void finalize() const;
+        SemaphoreHandle _sem{NullHandle};
 
     protected:
         WindowsSemaphore();
 
         virtual ~WindowsSemaphore();
 
-        void waitImpl() const;
+        void waitImpl();
 
-        void signalImpl() const;
+        void signalImpl();
     };
 
 }  // namespace Rt2::Threads

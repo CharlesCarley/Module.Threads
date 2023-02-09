@@ -26,8 +26,10 @@
 
 namespace Rt2::Threads
 {
-    constexpr sem_t           NullSemaphore = {};
-    constexpr pthread_mutex_t NullMutex     = {};
-    constexpr pthread_t       NullPThread   = {};
+    constexpr sem_t           NullSemaphore = NULL_PTHREAD;
+    constexpr pthread_mutex_t NullMutex     = NULL_PTHREAD;
+    constexpr pthread_t       NullPThread   = NULL_PTHREAD;
+
+    extern void LogError(const char *message, int err);
 
 }  // namespace Rt2::Threads

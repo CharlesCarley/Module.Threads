@@ -60,24 +60,26 @@ namespace Rt2::Threads
         delete _private;
     }
 
-    const Task& Task::invoke() const
+    void Task::invoke() const
     {
         if (_private)
             _private->start();
-        return *this;
     }
 
-    const Task& Task::wait(const uint32_t ms) const
-    {
-        if (_private)
-            _private->wait(ms);
-        return *this;
-    }
-
-    const Task& Task::whenDone(const TaskCall& call)
+    Task& Task::whenDone(const TaskCall& call)
     {
         _done = call;
         return *this;
+    }
+
+    void Task::start(const TaskCall& main)
+    {
+        Task(main).invoke();
+    }
+
+    void Task::start(const TaskCall& main, const TaskCall& onDone)
+    {
+        Task(main).whenDone(onDone).invoke();
     }
 
     void Task::notifyDone() const

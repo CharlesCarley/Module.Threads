@@ -29,7 +29,7 @@ namespace Rt2::Threads
     class WindowsThread
     {
     private:
-        ThreadHandle _thread{NullThread};
+        ThreadHandle _thread{NullHandle};
         size_t       _id{Npos};  // unused at the moment
 
     protected:
@@ -37,15 +37,10 @@ namespace Rt2::Threads
 
         virtual ~WindowsThread();
 
-        void waitImpl() const;
-
-        void waitImpl(size_t milliseconds) const;
-
         void startImpl();
 
         void joinImpl();
 
-    public:
         virtual int update()
         {
             joinImpl();
@@ -53,10 +48,5 @@ namespace Rt2::Threads
         }
     };
 
-
-    inline HANDLE toHandle(const ThreadHandle hand)
-    {
-        return reinterpret_cast<HANDLE>(hand);
-    }
 
 }  // namespace Rt2::Threads

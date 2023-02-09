@@ -21,7 +21,33 @@
 */
 #include "Threads/Posix/PosixUtils.h"
 #include "Threads/Windows/stubs/pthread.h"
+#include "Utils/Console.h"
 
 namespace Rt2::Threads
 {
+    void LogError(const char* message, const int err)
+    {
+        switch (err)
+        {
+        case EAGAIN:
+            Con::writeError("system error\n", message);
+            break;
+        case ENOMEM:
+            Con::writeError("out of memory\n", message);
+            break;
+        case EPERM:
+            Con::writeError("insufficient privileges\n", message);
+            break;
+        case EBUSY:
+            Con::writeError("reentry error\n", message);
+            break;
+        case EINVAL:
+            Con::writeError("invalid parameter\n", message);
+            break;
+        default:
+            Con::writeError("undefined error ", err, "\n", message);
+            break;
+        }
+    }
+
 }  // namespace Rt2::Threads

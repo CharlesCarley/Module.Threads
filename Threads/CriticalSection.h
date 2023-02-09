@@ -75,6 +75,6 @@ namespace Rt2::Threads
     };
 
 #define ScopeLockCs(cs) \
-    Rt2::Threads::CriticalSectionLock ____scope__lock__(cs)
+    Rt2::Threads::CriticalSectionLock ____scope__lock__(&cs)
 
 }  // namespace Rt2::Threads

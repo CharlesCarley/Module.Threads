@@ -19,28 +19,32 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
-#include "WindowsMutex.h"
-#include <Windows.h>
+#include "Threads/Windows/WindowsMutex.h"
+#include "Threads/Windows/WindowsUtils.h"
 #include "Utils/Console.h"
 
 namespace Rt2::Threads
 {
-    WindowsMutex::WindowsMutex() :
-        _isLocked(false)
+    WindowsMutex::WindowsMutex()
     {
-        _mutex = (size_t)CreateMutex(nullptr, false, nullptr);
-        if (!_mutex)
-        {
-            Console::writeLine("CreateMutex returned: ", ::GetLastError());
-        }
+        if (HANDLE handle = CreateMutex(
+                nullptr,  // lpMutexAttributes
+                FALSE,    // bInitialOwner
+                nullptr   // lpName -  No name
+            );
+            handle == nullptr)
+            LogError("failed to create mutex", FALSE);
+        else
+            _mutex = (MutexHandle)handle;
     }
 
     WindowsMutex::~WindowsMutex()
     {
-        if (_mutex)
+        if (const HANDLE hand = toHandle(_mutex))
         {
-            ::CloseHandle((HANDLE)_mutex);
-            _mutex = 0;
+            if (CloseHandle(hand) == FALSE)
+                LogError("failed to close handle", FALSE);
+            _mutex = NullHandle;
         }
     }
 
@@ -58,33 +62,29 @@ namespace Rt2::Threads
         if (_isLocked)
         {
             _isLocked = false;
-            notifyImpl();
+            waitImpl();
         }
     }
 
-    void WindowsMutex::waitImpl() const
+    void WindowsMutex::waitImpl()
     {
-        if (_mutex)
+        waitImpl(INFINITE);
+    }
+
+    void WindowsMutex::waitImpl(const size_t ms)
+    {
+        if (_mutex != NullHandle)
         {
-            const int res = ::WaitForSingleObject((HANDLE)_mutex, INFINITE);
-            if (res)
-                Console::writeLine("WaitForSingleObject returned: ", res, ' ', GetLastError());
-        }
-    }
+            if (const HANDLE handle = toHandle(_mutex))
+            {
+                if (WaitForSingleObject(handle, (DWORD)ms) == WAIT_FAILED)
+                    LogError("failed to wait", WAIT_FAILED);
 
-    void WindowsMutex::waitImpl(size_t milliseconds) const
-    {
-        if (_mutex)
-        {
-            const int res = ::WaitForSingleObject((HANDLE)_mutex, (DWORD)milliseconds);
-            if (res)
-                Console::writeLine("WaitForSingleObject returned: ", res, ' ', ::GetLastError());
-        }
-    }
+                if (ReleaseMutex(handle) == FALSE)
+                    LogError("failed to release mutex", FALSE);
 
-    void WindowsMutex::notifyImpl() const
-    {
-        if (_mutex)
-            ::ReleaseMutex((HANDLE)_mutex);
+                _isLocked = false;
+            }
+        }
     }
 }  // namespace Rt2::Threads

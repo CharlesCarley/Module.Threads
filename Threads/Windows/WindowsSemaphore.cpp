@@ -20,83 +20,51 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Windows/WindowsSemaphore.h"
-#include <Windows.h>
+#include "Threads/Windows/WindowsUtils.h"
 #include "Utils/Console.h"
+#include "Utils/StreamMethods.h"
 
 namespace Rt2::Threads
 {
-    WindowsSemaphore::WindowsSemaphore() :
-        _handle(0)
+    WindowsSemaphore::WindowsSemaphore()
     {
-        initialize();
+        if (HANDLE handle = CreateSemaphore(
+                nullptr,  // Cannot be inherited by child processes.
+                0,        // lInitialCount
+                1,        // lMaximumCount
+                nullptr   // lpName -  No name
+            );
+            handle == nullptr)
+            LogError("failed to create semaphore", FALSE);
+        else
+            _sem = (SemaphoreHandle)handle;
     }
 
     WindowsSemaphore::~WindowsSemaphore()
     {
-        finalize();
-    }
-
-    void WindowsSemaphore::initialize()
-    {
-        _handle = (size_t)CreateSemaphore(
-            nullptr,  // Cannot be inherited by child processes.
-            0,        // lInitialCount
-            1,        // lMaximumCount
-            nullptr   // lpName -  No name
-        );
-        if (!_handle)
-            Console::writeLine("Failed to create semaphore : ",
-                               GetLastError());
-    }
-
-    void WindowsSemaphore::finalize() const
-    {
-        try
+        if (const HANDLE hand = toHandle(_sem))
         {
-            if (!_handle)
-                return;
-
-            if (CloseHandle((HANDLE)_handle) == FALSE)
-            {
-                Console::writeLine("Failed to close the semaphore handle : ",
-                                   GetLastError());
-            }
-        }
-        catch (...)
-        {
+            if (CloseHandle(hand) == FALSE)
+                LogError("failed to close handle", FALSE);
+            _sem = NullHandle;
         }
     }
 
-    void WindowsSemaphore::waitImpl() const
+    void WindowsSemaphore::waitImpl()
     {
-        if (_handle)
+        if (const HANDLE hand = toHandle(_sem))
         {
-            const int res = WaitForSingleObject((HANDLE)_handle, INFINITE);
-            if (res)
-            {
-                Console::writeLine(
-                    "WaitForSingleObject returned(",
-                    res,
-                    "): ",
-                    GetLastError());
-            }
+            if (WaitForSingleObject(hand, INFINITE) == WAIT_FAILED)
+                LogError("failed to wait on handle", WAIT_FAILED);
         }
     }
 
-    void WindowsSemaphore::signalImpl() const
+    void WindowsSemaphore::signalImpl()
     {
-        if (_handle)
+        if (const HANDLE hand = toHandle(_sem))
         {
-            if (ReleaseSemaphore(
-                    (HANDLE)_handle,  // hSemaphore
-                    1,                // lReleaseCount,
-                    nullptr           // lpPreviousCount
-                    ) == FALSE)
-            {
-                // Console::writeLine(
-                //    "Failed to release the semaphore handle : ",
-                //    GetLastError());
-            }
+            if (ReleaseSemaphore(hand, 1, nullptr) == FALSE)
+                LogError("failed to release handle: ", FALSE);
         }
     }
 }  // namespace Rt2::Threads

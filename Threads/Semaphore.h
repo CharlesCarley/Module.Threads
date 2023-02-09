@@ -44,12 +44,12 @@ namespace Rt2::Threads
 
         ~Semaphore() override = default;
 
-        void wait() const
+        void wait()
         {
             waitImpl();
         }
 
-        void signal() const
+        void signal()
         {
             signalImpl();
         }

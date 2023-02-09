@@ -27,8 +27,9 @@ namespace Rt2::Threads
 {
     typedef uintptr_t ThreadHandle;
     typedef uintptr_t MutexHandle;
+    typedef uintptr_t SemaphoreHandle;
 
-    constexpr ThreadHandle NullThread = MakeLimit<ThreadHandle>();
+    constexpr uintptr_t    NullHandle = MakeLimit<uintptr_t>();
     constexpr ThreadHandle NoError    = 0;
 
 }  // namespace Rt2::Threads

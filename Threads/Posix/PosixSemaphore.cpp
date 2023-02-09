@@ -23,13 +23,19 @@
 #include "Threads/Posix/PosixUtils.h"
 #include "Utils/Console.h"
 
+#define SHARED_SINGLE_PROCESS 0
+
+// defined as 1 so that decrementing to 0 will block 
+#define BINARY_SEM_COUNT 1
+
 namespace Rt2::Threads
 {
-
-
     PosixSemaphore::PosixSemaphore()
     {
-        if (const int st = sem_init(&_handle, 0, 1);
+        if (const int st = sem_init(
+                &_sem,
+                SHARED_SINGLE_PROCESS,
+                BINARY_SEM_COUNT);
             st == -1)
         {
             switch (errno)
@@ -49,45 +55,55 @@ namespace Rt2::Threads
                 Console::writeLine("sem_init - unknown error");
                 break;
             }
-            _handle = NullSemaphore;
-            _init   = false;
+            _sem  = NullSemaphore;
+            _init = false;
         }
     }
 
     PosixSemaphore::~PosixSemaphore()
     {
-        if (const int st = sem_destroy(&_handle);
-            st == -1)
+        if (_init)
         {
-            switch (errno)
+            if (const int st = sem_destroy(&_sem);
+                st == -1)
             {
-            case EINVAL:
-                Console::writeLine("Invalid handle");
-                break;
-            case ENOSYS:
-                Console::writeLine("sem_destroy is not supported");
-                break;
-            case EBUSY:
-                Console::writeLine("semaphore is in use");
-                break;
-            default:
-                Console::writeLine("sem_destroy - unknown error");
-                break;
-            }
+                switch (errno)
+                {
+                case EINVAL:
+                    Console::writeLine("Invalid handle");
+                    break;
+                case ENOSYS:
+                    Console::writeLine("sem_destroy is not supported");
+                    break;
+                case EBUSY:
+                    Console::writeLine("semaphore is in use");
+                    break;
+                default:
+                    Console::writeLine("sem_destroy - unknown error");
+                    break;
+                }
 
-            _handle = NullSemaphore;
+                _sem = NullSemaphore;
+                _locked = false;
+            }
         }
     }
 
-    void PosixSemaphore::waitImpl() const
+    void PosixSemaphore::waitImpl()
     {
         if (_init)
-            sem_wait(const_cast<sem_t*>(&_handle));
+        {
+            _locked = true;
+            sem_wait(&_sem);
+        }
     }
 
-    void PosixSemaphore::signalImpl() const
+    void PosixSemaphore::signalImpl()
     {
         if (_init)
-            sem_post(const_cast<sem_t*>(&_handle));
+        {
+            if (_locked)
+                sem_post(&_sem);
+        }
     }
 }  // namespace Rt2::Threads

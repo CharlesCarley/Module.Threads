@@ -29,7 +29,7 @@ namespace Rt2::Threads
     class PosixCriticalSection
     {
     private:
-        pthread_mutex_t _mutex{};
+        pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
         int             _status{NoError};
 
     protected:

@@ -44,32 +44,12 @@ namespace Rt2::Threads
 
         ~Thread() override;
 
-        void wait() const
-        {
-            waitImpl(0);
-        }
 
-        void wait(const size_t milliseconds) const
-        {
-            waitImpl(milliseconds);
-        }
+        void start();
 
-        void start()
-        {
-            startImpl();
-        }
+        void join();
 
-        void join()
-        {
-            joinImpl();
-        }
-
-        int update() override
-        {
-            // rejoin the thread if not overridden
-            joinImpl();
-            return 0;
-        }
+        int update() override;
     };
 
 }  // namespace Rt2::Threads

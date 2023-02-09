@@ -20,33 +20,19 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
 
-#include <functional>
+#include <Windows.h>
+#include "Threads/ThreadUtils.h"
 
 namespace Rt2::Threads
 {
-    class TaskPrivate;
-    using TaskCall = std::function<void()>;
-
-    class Task
+    inline HANDLE toHandle(const uintptr_t hand)
     {
-    private:
-        friend TaskPrivate;
-        TaskPrivate* _private{nullptr};
-        TaskCall     _done{nullptr};
+        return hand == NullHandle ? nullptr : reinterpret_cast<HANDLE>(hand);
+    }
 
-        void notifyDone() const;
+    extern void LogError(const char* message, DWORD res);
 
-        void invoke() const;
-
-        Task& whenDone(const TaskCall& call);
-
-    public:
-        explicit Task(const TaskCall& call);
-        ~Task();
-
-        static void start(const TaskCall& main, const TaskCall& onDone);
-
-        static void start(const TaskCall& main);
-    };
 }  // namespace Rt2::Threads
+#endif

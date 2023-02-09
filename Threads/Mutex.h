@@ -52,24 +52,21 @@ namespace Rt2::Threads
             unlockImpl();
         }
 
-        void wait() const
+        void wait()
         {
             waitImpl();
         }
 
-        void wait(const size_t milliseconds) const
+        void wait(const size_t ms)
         {
-            waitImpl(milliseconds);
-        }
-
-        void notify() const
-        {
-            notifyImpl();
+            waitImpl(ms);
         }
     };
 
     class ScopeLock
     {
+    private:
+        Mutex* _mutex;
     public:
         explicit ScopeLock(Mutex* mtx) :
             _mutex(mtx)
@@ -83,9 +80,9 @@ namespace Rt2::Threads
             if (_mutex)
                 _mutex->unlock();
         }
-
-    private:
-        Mutex* _mutex;
     };
+
+#define ScopeLockMtx(mtx) \
+    Rt2::Threads::ScopeLock ____scope__lock__(&mtx)
 
 }  // namespace Rt2::Threads

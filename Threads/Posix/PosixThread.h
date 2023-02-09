@@ -30,24 +30,18 @@ namespace Rt2::Threads
     class PosixThread
     {
     private:
-        size_t    _id{Npos};
-        pthread_t _thread{NullPThread};
+        size_t         _id{Npos};
+        pthread_t      _thread{NullPThread};
+        pthread_attr_t _attr{};
 
     protected:
         PosixThread();
 
         virtual ~PosixThread();
 
-        void waitImpl() const;
-
-        void waitImpl(size_t milliseconds) const;
-
         void startImpl();
 
         void joinImpl();
-
-    public:
-
 
         virtual int update();
     };

@@ -28,10 +28,9 @@ namespace Rt2::Threads
 {
     PosixMutex::PosixMutex()
     {
-        if (int status = pthread_mutex_init(&_mutex, nullptr);
-            status != NoError)
+        if (const int st = pthread_mutex_init(&_mutex, nullptr); st != NoError)
         {
-            Console::writeLine("failed to initialize mutex ", status);
+            LogError("failed to initialize mutex", st);
             _isInit = false;
         }
     }
@@ -40,58 +39,53 @@ namespace Rt2::Threads
     {
         if (_isInit)
         {
-            if (int status = pthread_mutex_destroy(&_mutex);
-                status != NoError)
-                Console::writeLine("failed to finalize mutex: ", status);
+            if (_isLocked)
+                unlockImpl();
+
+            if (const int err = pthread_mutex_destroy(&_mutex); err != NoError)
+                LogError("failed to finalize mutex", err);
             _isInit = false;
         }
     }
 
     void PosixMutex::lockImpl()
     {
-        notifyImpl();
+        if (_isInit && !_isLocked)
+        {
+            if (const int err = pthread_mutex_lock(&_mutex); err != NoError)
+                LogError("failed to lock mutex", err);
+            else
+                _isLocked = true;
+        }
     }
 
     void PosixMutex::unlockImpl()
     {
-        if (_isInit)
+        if (_isInit && _isLocked)
         {
-            if (int status = pthread_mutex_unlock(&_mutex);
-                status != NoError)
-                Console::writeLine("failed to unlock mutex: ", status);
+            if (const int err = pthread_mutex_unlock(&_mutex); err != NoError)
+                LogError("failed to unlock mutex", err);
+            else
+                _isLocked = false;
         }
     }
 
-    void PosixMutex::waitImpl() const
+    void PosixMutex::waitImpl()
     {
-        if (_isInit)
-        {
-            if (int status = pthread_mutex_lock(
-                    const_cast<pthread_mutex_t*>(&_mutex));
-                status != NoError)
-                Console::writeLine("failed to lock mutex: ", status);
-        }
+        lockImpl();
     }
 
-    void PosixMutex::waitImpl(const size_t milliseconds) const
+    void PosixMutex::waitImpl(const size_t milliseconds)
     {
-        if (_isInit)
+        if (_isInit && !_isLocked)
         {
             struct timespec timed = {0, (long)(milliseconds * 1000)};
-            if (int status = pthread_mutex_timedlock(
-                    const_cast<pthread_mutex_t*>(&_mutex), &timed);
-                status != NoError)
-                Console::writeLine("failed to lock mutex: ", status);
+
+            if (int err = pthread_mutex_timedlock(&_mutex, &timed); err != NoError)
+                LogError("failed to lock mutex", err);
+            else
+                _isLocked = true;
         }
     }
 
-    void PosixMutex::notifyImpl() const
-    {
-        if (_isInit)
-        {
-            if (int status = pthread_mutex_lock(const_cast<pthread_mutex_t*>(&_mutex));
-                status != NoError)
-                Console::writeLine("failed to lock mutex: ", status);
-        }
-    }
 }  // namespace Rt2::Threads

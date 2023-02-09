@@ -20,8 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Windows/WindowsThread.h"
-#include <Windows.h>
-#include "Threads/Windows/WindowsMutex.h"
+#include "Threads/Windows/WindowsUtils.h"
 #include "Utils/Console.h"
 #include "Utils/Exception.h"
 
@@ -36,7 +35,7 @@ namespace Rt2::Threads
     {
         struct Runner
         {
-            static DWORD WINAPI hook(const LPVOID user)
+            static DWORD WINAPI invoke(const LPVOID user)
             {
                 try
                 {
@@ -54,56 +53,40 @@ namespace Rt2::Threads
             }
         };
 
-        if (_thread != NullThread)
+        if (_thread != NullHandle)
             joinImpl();
 
-        _thread = (ThreadHandle)CreateThread(
-            nullptr,       // No inheritance
-            0,             // Use the default stack size
-            Runner::hook,  // main routine
-            this,          // parameter
-            0,             // dwCreationFlags
-            (LPDWORD)&_id  // lpThreadId
-        );
-    }
 
-    void WindowsThread::waitImpl() const
-    {
-        if (_thread != NullThread)
-            ::WaitForSingleObject(toHandle(_thread), INFINITE);
-    }
+        if (HANDLE handle = CreateThread(
+                nullptr,           // No inheritance
+                0,                 // Use the default stack size
+                Runner::invoke,    // main routine
+                this,              // parameter
+                CREATE_SUSPENDED,  // dwCreationFlags
+                (LPDWORD)&_id      // lpThreadId
+            );
+            handle == nullptr)
+            LogError("failed to create thread", FALSE);
+        else
+        {
+            _thread = (ThreadHandle)handle;
 
-    void WindowsThread::waitImpl(const size_t milliseconds) const
-    {
-        if (_thread != NullThread)
-            ::WaitForSingleObjectEx(
-                toHandle(_thread),
-                (DWORD)milliseconds,
-                TRUE);
+            if (ResumeThread(handle) == (DWORD)-1)
+                LogError("failed to resume thread", (DWORD)-1);
+        }
     }
 
     void WindowsThread::joinImpl()
     {
-        try
+        if (const HANDLE handle = toHandle(_thread))
         {
-            if (_thread != NullThread)
-            {
-                waitImpl(INFINITE);
-                if (CloseHandle(toHandle(_thread)) == FALSE)
-                    Console::writeLine("Failed to close thread handle : ", GetLastError());
-                _thread = NullThread;
-                _id     = Npos;
-            }
-        }
-        catch (Exception& ex)
-        {
-            Console::writeLine(ex.what());
-            _thread = NullThread;
-            _id     = Npos;
-        }
-        catch (...)
-        {
-            _thread = NullThread;
+            if (WaitForSingleObjectEx(handle, INFINITE, TRUE) == WAIT_FAILED)
+                LogError("failed to wait on thread", WAIT_FAILED);
+
+            if (CloseHandle(handle) == FALSE)
+                LogError("failed to close handle", FALSE);
+
+            _thread = NullHandle;
             _id     = Npos;
         }
     }
