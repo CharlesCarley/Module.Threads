@@ -54,7 +54,7 @@ namespace Rt2::Threads
         if (int st = pthread_create(&_thread, &_attr, Runner::hook, this);
             st != 0)
         {
-            Con::writeError("failed to create thread: ", st);
+            Console::writeError("failed to create thread: ", st);
         }
     }
 
@@ -63,9 +63,9 @@ namespace Rt2::Threads
         if (_thread != NullPThread)
         {
             if (int st = pthread_join(_thread, nullptr); st != 0)
-                Con::writeError("failed to destroy thread: ", st);
+                Console::writeError("failed to destroy thread: ", st);
             if (int st = pthread_attr_destroy(&_attr); st != 0)
-                Con::writeError("failed to destroy thread: ", st);
+                Console::writeError("failed to destroy thread: ", st);
 
             _attr   = {};
             _thread = NullPThread;

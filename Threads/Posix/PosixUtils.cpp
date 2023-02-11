@@ -20,7 +20,6 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Posix/PosixUtils.h"
-#include "Threads/Windows/stubs/pthread.h"
 #include "Utils/Console.h"
 
 namespace Rt2::Threads
@@ -30,22 +29,22 @@ namespace Rt2::Threads
         switch (err)
         {
         case EAGAIN:
-            Con::writeError("system error\n", message);
+            Console::writeError("system error\n", message);
             break;
         case ENOMEM:
-            Con::writeError("out of memory\n", message);
+            Console::writeError("out of memory\n", message);
             break;
         case EPERM:
-            Con::writeError("insufficient privileges\n", message);
+            Console::writeError("insufficient privileges\n", message);
             break;
         case EBUSY:
-            Con::writeError("reentry error\n", message);
+            Console::writeError("reentry error\n", message);
             break;
         case EINVAL:
-            Con::writeError("invalid parameter\n", message);
+            Console::writeError("invalid parameter\n", message);
             break;
         default:
-            Con::writeError("undefined error ", err, "\n", message);
+            Console::writeError("undefined error ", err, "\n", message);
             break;
         }
     }
