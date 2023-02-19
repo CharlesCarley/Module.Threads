@@ -20,6 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Thread.h"
+#include <thread>
 
 namespace Rt2::Threads
 {
