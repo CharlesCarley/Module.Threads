@@ -39,7 +39,8 @@ namespace Rt2::Threads
         if (_thread != NullPThread)
             joinImpl();
 
-        struct Runner {
+        struct Runner
+        {
             static void* hook(void* arg0)
             {
                 if (Thread* thread = (Thread*)arg0)
@@ -71,7 +72,6 @@ namespace Rt2::Threads
             _thread = NullPThread;
         }
     }
-
 
     int PosixThread::update()
     {

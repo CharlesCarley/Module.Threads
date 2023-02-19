@@ -24,9 +24,9 @@
 #include "Threads/ThreadUtils.h"
 
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
-#include "Threads/Windows/WindowsThread.h"
+    #include "Threads/Windows/WindowsThread.h"
 #else
-#include "Threads/Posix/PosixThread.h"
+    #include "Threads/Posix/PosixThread.h"
 #endif
 
 namespace Rt2::Threads
@@ -44,12 +44,13 @@ namespace Rt2::Threads
 
         ~Thread() override;
 
-
         void start();
 
         void join();
 
         int update() override;
+
+        static void sleep(U32 ms);
     };
 
 }  // namespace Rt2::Threads

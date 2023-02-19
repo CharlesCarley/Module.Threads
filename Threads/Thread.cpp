@@ -23,7 +23,7 @@
 
 namespace Rt2::Threads
 {
-    Thread::Thread() = default;
+    Thread::Thread()  = default;
     Thread::~Thread() = default;
 
     void Thread::start()
@@ -42,4 +42,10 @@ namespace Rt2::Threads
         joinImpl();
         return 0;
     }
+
+    void Thread::sleep(const U32 ms)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    }
+
 }  // namespace Rt2::Threads

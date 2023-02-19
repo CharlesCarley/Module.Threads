@@ -19,8 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
+#include <utility>
+#include "MemoryDataStore.h"
 #include "Threads/CriticalSection.h"
-#include "Threads/MemoryDataStore.h"
 #include "Threads/ProcessQueue.h"
 #include "Threads/Task.h"
 #include "Utils/Console.h"
@@ -47,9 +48,9 @@ GTEST_TEST(Threads, Thread_001)
         [&x]
         {
             EXPECT_EQ(x, 10000);
-            x+=1;
+            x += 1;
         });
-   EXPECT_EQ(x, 10001);
+    EXPECT_EQ(x, 10001);
 }
 
 GTEST_TEST(Threads, Thread_002)
