@@ -20,7 +20,6 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Task.h"
-#include <cstdint>
 #include "Threads/Thread.h"
 
 namespace Rt2::Threads
