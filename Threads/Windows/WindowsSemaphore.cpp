@@ -21,8 +21,8 @@
 */
 #include "Threads/Windows/WindowsSemaphore.h"
 #include "Threads/Windows/WindowsUtils.h"
-#include "Utils/Console.h"
 #include "Utils/StreamMethods.h"
+#include "Utils/Win32/Error.h"
 
 namespace Rt2::Threads
 {
@@ -35,7 +35,7 @@ namespace Rt2::Threads
                 nullptr   // lpName -  No name
             );
             handle == nullptr)
-            LogError("failed to create semaphore", FALSE);
+            Win32::LogError("failed to create semaphore", FALSE);
         else
             _sem = (SemaphoreHandle)handle;
     }
@@ -45,7 +45,7 @@ namespace Rt2::Threads
         if (const HANDLE hand = toHandle(_sem))
         {
             if (CloseHandle(hand) == FALSE)
-                LogError("failed to close handle", FALSE);
+                Win32::LogError("failed to close handle", FALSE);
             _sem = NullHandle;
         }
     }
@@ -55,7 +55,7 @@ namespace Rt2::Threads
         if (const HANDLE hand = toHandle(_sem))
         {
             if (WaitForSingleObject(hand, INFINITE) == WAIT_FAILED)
-                LogError("failed to wait on handle", WAIT_FAILED);
+                Win32::LogError("failed to wait on handle", WAIT_FAILED);
         }
     }
 
@@ -64,7 +64,7 @@ namespace Rt2::Threads
         if (const HANDLE hand = toHandle(_sem))
         {
             if (ReleaseSemaphore(hand, 1, nullptr) == FALSE)
-                LogError("failed to release handle: ", FALSE);
+                Win32::LogError("failed to release handle: ", FALSE);
         }
     }
 }  // namespace Rt2::Threads

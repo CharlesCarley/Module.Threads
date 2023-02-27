@@ -23,6 +23,7 @@
 #include "Threads/Windows/WindowsUtils.h"
 #include "Utils/Console.h"
 #include "Utils/Exception.h"
+#include "Utils/Win32/Error.h"
 
 namespace Rt2::Threads
 {
@@ -66,13 +67,13 @@ namespace Rt2::Threads
                 (LPDWORD)&_id      // lpThreadId
             );
             handle == nullptr)
-            LogError("failed to create thread", FALSE);
+            Win32::LogError("failed to create thread", FALSE);
         else
         {
             _thread = (ThreadHandle)handle;
 
             if (ResumeThread(handle) == (DWORD)-1)
-                LogError("failed to resume thread", (DWORD)-1);
+                Win32::LogError("failed to resume thread", (DWORD)-1);
         }
     }
 
@@ -81,10 +82,10 @@ namespace Rt2::Threads
         if (const HANDLE handle = toHandle(_thread))
         {
             if (WaitForSingleObjectEx(handle, INFINITE, TRUE) == WAIT_FAILED)
-                LogError("failed to wait on thread", WAIT_FAILED);
+                Win32::LogError("failed to wait on thread", WAIT_FAILED);
 
             if (CloseHandle(handle) == FALSE)
-                LogError("failed to close handle", FALSE);
+                Win32::LogError("failed to close handle", FALSE);
 
             _thread = NullHandle;
             _id     = Npos;

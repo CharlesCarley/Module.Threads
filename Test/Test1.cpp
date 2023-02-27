@@ -50,6 +50,8 @@ GTEST_TEST(Threads, Thread_001)
             EXPECT_EQ(x, 10000);
             x += 1;
         });
+
+    Task::joinAll();
     EXPECT_EQ(x, 10001);
 }
 
@@ -65,7 +67,7 @@ GTEST_TEST(Threads, Thread_002)
         Task::start([]
                     { OutputDatabase::insert("World"); });
     }
-
+    Task::joinAll();
     const OutputDatabase::Database& db = OutputDatabase::get();
 
     int i = 0;

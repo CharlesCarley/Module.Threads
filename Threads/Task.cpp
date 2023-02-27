@@ -21,9 +21,69 @@
 */
 #include "Threads/Task.h"
 #include "Threads/Thread.h"
+#include "Threads/CriticalSection.h"
+#include "Utils/StreamMethods.h"
 
 namespace Rt2::Threads
 {
+
+    class TaskManager
+    {
+    private:
+        friend class Task;
+        using TaskList = Array<Task*>;
+        static TaskManager*    _inst;
+        TaskList               _tasks;
+        static CriticalSection _section;
+
+        void push(Task* task)
+        {
+            if (task)
+                _tasks.push_back(task);
+        }
+
+        void remove(Task* task)
+        {
+            if (const U32 loc = _tasks.find(task); loc != Npos32)
+            {
+                const Task* dangle = _tasks.at(loc);
+                _tasks.remove(loc);
+                delete dangle;
+            }
+        }
+
+        void clear()
+        {
+            // Console::writeLine("Tasks: ", _tasks.size());
+            // for (const auto task : _tasks)
+            //     Console::writeLine("     : ", Hex((size_t)task));
+            for (const auto task : _tasks)
+                delete task;
+            _tasks.clear();
+        }
+
+        TaskManager()
+        {
+            _inst = this;
+        }
+
+        ~TaskManager()
+        {
+            clear();
+            _inst = nullptr;
+        }
+
+        static TaskManager& get()
+        {
+            static TaskManager mgr;
+            ScopeLockCs(_section);
+            return *_inst;
+        }
+    };
+
+    CriticalSection TaskManager::_section;
+    TaskManager*    TaskManager::_inst = nullptr;
+
     class TaskPrivate final : public Thread
     {
     private:
@@ -73,12 +133,23 @@ namespace Rt2::Threads
 
     void Task::start(const TaskCall& main)
     {
-        Task(main).invoke();
+        Task* tsk = new Task(main);
+        tsk->whenDone([=] {});
+        TaskManager::get().push(tsk);
+        tsk->invoke();
+    }
+
+    void Task::joinAll()
+    {
+        TaskManager::get().clear();
     }
 
     void Task::start(const TaskCall& main, const TaskCall& onDone)
     {
-        Task(main).whenDone(onDone).invoke();
+        Task* tsk = new Task(main);
+        tsk->whenDone(onDone);
+        TaskManager::get().push(tsk);
+        tsk->invoke();
     }
 
     void Task::notifyDone() const

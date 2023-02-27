@@ -22,6 +22,7 @@
 #include "Threads/Windows/WindowsMutex.h"
 #include "Threads/Windows/WindowsUtils.h"
 #include "Utils/Console.h"
+#include "Utils/Win32/Error.h"
 
 namespace Rt2::Threads
 {
@@ -33,7 +34,7 @@ namespace Rt2::Threads
                 nullptr   // lpName -  No name
             );
             handle == nullptr)
-            LogError("failed to create mutex", FALSE);
+            Win32::LogError("failed to create mutex", FALSE);
         else
             _mutex = (MutexHandle)handle;
     }
@@ -43,7 +44,7 @@ namespace Rt2::Threads
         if (const HANDLE hand = toHandle(_mutex))
         {
             if (CloseHandle(hand) == FALSE)
-                LogError("failed to close handle", FALSE);
+                Win32::LogError("failed to close handle", FALSE);
             _mutex = NullHandle;
         }
     }
@@ -78,10 +79,10 @@ namespace Rt2::Threads
             if (const HANDLE handle = toHandle(_mutex))
             {
                 if (WaitForSingleObject(handle, (DWORD)ms) == WAIT_FAILED)
-                    LogError("failed to wait", WAIT_FAILED);
+                    Win32::LogError("failed to wait", WAIT_FAILED);
 
                 if (ReleaseMutex(handle) == FALSE)
-                    LogError("failed to release mutex", FALSE);
+                    Win32::LogError("failed to release mutex", FALSE);
 
                 _isLocked = false;
             }

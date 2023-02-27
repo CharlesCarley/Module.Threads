@@ -22,9 +22,11 @@
 #pragma once
 
 #include <functional>
+#include "Utils/Array.h"
 
 namespace Rt2::Threads
 {
+
     class TaskPrivate;
     using TaskCall = std::function<void()>;
 
@@ -48,5 +50,7 @@ namespace Rt2::Threads
         static void start(const TaskCall& main, const TaskCall& onDone);
 
         static void start(const TaskCall& main);
+
+        static void joinAll();
     };
 }  // namespace Rt2::Threads

@@ -20,10 +20,11 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-#if RT_PLATFORM == RT_PLATFORM_WINDOWS
+#include "Utils/Definitions.h"
 
-#include <Windows.h>
-#include "Threads/ThreadUtils.h"
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
+    #include <Windows.h>
+    #include "Threads/ThreadUtils.h"
 
 namespace Rt2::Threads
 {
@@ -31,8 +32,6 @@ namespace Rt2::Threads
     {
         return hand == NullHandle ? nullptr : reinterpret_cast<HANDLE>(hand);
     }
-
-    extern void LogError(const char* message, DWORD res);
 
 }  // namespace Rt2::Threads
 #endif

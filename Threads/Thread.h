@@ -51,6 +51,7 @@ namespace Rt2::Threads
         int update() override;
 
         static void sleep(U32 ms);
+        static void yield();
     };
 
 }  // namespace Rt2::Threads

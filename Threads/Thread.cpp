@@ -49,4 +49,9 @@ namespace Rt2::Threads
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
+    void Thread::yield()
+    {
+        sleep(1);
+    }
+
 }  // namespace Rt2::Threads

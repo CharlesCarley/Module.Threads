@@ -20,31 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #include "Threads/Windows/WindowsUtils.h"
-#include "Utils/Console.h"
-#include "Utils/StreamMethods.h"
 
 namespace Rt2::Threads
 {
-    void LogError(const char* message, DWORD res)
-    {
-        const DWORD err = GetLastError();
-        LPSTR       buf = nullptr;
-        FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-            nullptr,
-            err,
-            0,
-            (LPSTR)&buf,
-            0,
-            nullptr);
-
-        if (buf)
-        {
-            Console::writeError("code: ", Hex(err), ", ", buf, " ", message);
-            LocalFree(buf);
-        }
-        else
-            Console::writeError(message, ": (", res, ") ", err);
-    }
-
 }  // namespace Rt2::Threads
